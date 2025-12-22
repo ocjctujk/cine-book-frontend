@@ -14,6 +14,9 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Layout from "../components/Layout";
+interface Seats {
+  [key: string]: Seat[];
+}
 
 interface Seat {
   id: number;
@@ -43,7 +46,7 @@ export interface ShowData {
   screen: {
     id: number;
     name: string;
-    seats: Seat[];
+    seats: Seats;
   };
 }
 
@@ -147,12 +150,6 @@ export default function SeatSelection() {
     );
   }
 
-  const groupedSeats = showData.screen.seats.reduce((acc, seat) => {
-    if (!acc[seat.columnLetter]) acc[seat.columnLetter] = [];
-    acc[seat.columnLetter].push(seat);
-    return acc;
-  }, {} as Record<string, Seat[]>);
-
   const totalCost = selectedSeats.length * parseFloat(showData.cost);
 
   return (
@@ -187,55 +184,82 @@ export default function SeatSelection() {
           </Box>
 
           {/* Seats Grid */}
+          {/* Seats Grid */}
           <Box display="flex" justifyContent="center" overflow="auto">
             <Box>
-              {Object.entries(groupedSeats).map(([column, seats]) => (
-                <Stack
-                  key={column}
-                  direction="row"
-                  spacing={1}
-                  mb={2}
-                  alignItems="center"
-                >
-                  <Typography
-                    sx={{
-                      width: 32,
-                      textAlign: "center",
-                      fontSize: "0.75rem",
-                      fontWeight: "bold",
-                      color: "grey.500",
-                    }}
-                  >
-                    {column}
-                  </Typography>
-                  <Stack direction="row" spacing={1}>
-                    {seats.map((seat) => {
-                      const isSelected = selectedSeats.includes(seat.id);
-                      const isAvailable = !seat.isBooked;
+              {/* Pre-calculate max seats per row */}
+              {(() => {
+                const rows = Object.values(showData.screen.seats);
+                const maxSeats = Math.max(...rows.map((row) => row.length));
 
-                      return (
-                        <SeatButton
-                          key={seat.id}
-                          onClick={() =>
-                            isAvailable && handleSeatClick(seat.id)
-                          }
-                          disabled={!isAvailable}
-                          className={
-                            !isAvailable
-                              ? "unavailable"
-                              : isSelected
-                              ? "selected"
-                              : "available"
-                          }
-                          title={seat.name}
-                        >
-                          {seat.rowNumber}
-                        </SeatButton>
-                      );
-                    })}
-                  </Stack>
-                </Stack>
-              ))}
+                // Seat button width + gap: 36px + 8px (spacing={1})
+                const seatWidth = 36;
+                const gap = 8;
+                const totalSeatsWidth =
+                  maxSeats * seatWidth + (maxSeats - 1) * gap;
+
+                return Object.entries(showData.screen.seats).map(
+                  ([rowLabel, seats]) => (
+                    <Stack
+                      key={rowLabel}
+                      direction="row"
+                      spacing={1}
+                      mb={2}
+                      alignItems="center"
+                    >
+                      {/* Row Label - fixed on the left */}
+                      <Typography
+                        sx={{
+                          width: 32,
+                          textAlign: "center",
+                          fontSize: "0.75rem",
+                          fontWeight: "bold",
+                          color: "grey.500",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {rowLabel}
+                      </Typography>
+
+                      {/* Centered seats container */}
+                      <Box
+                        sx={{
+                          width: totalSeatsWidth,
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Stack direction="row" spacing={1}>
+                          {seats.map((seat) => {
+                            const isSelected = selectedSeats.includes(seat.id);
+                            const isAvailable = !seat.isBooked;
+
+                            return (
+                              <SeatButton
+                                key={seat.id}
+                                onClick={() =>
+                                  isAvailable && handleSeatClick(seat.id)
+                                }
+                                disabled={!isAvailable}
+                                className={
+                                  !isAvailable
+                                    ? "unavailable"
+                                    : isSelected
+                                    ? "selected"
+                                    : "available"
+                                }
+                                title={seat.name}
+                              >
+                                {seat.rowNumber}
+                              </SeatButton>
+                            );
+                          })}
+                        </Stack>
+                      </Box>
+                    </Stack>
+                  )
+                );
+              })()}
             </Box>
           </Box>
 

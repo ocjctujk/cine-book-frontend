@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Chip,
   Button,
+  Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import apiService from "../api/apiService";
@@ -163,6 +164,28 @@ export default function Movies() {
                     {movie.description}
                   </Typography>
 
+                  {/* 🎬 GENRES SECTION */}
+                  {movie.genres && movie.genres.length > 0 && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 0.5,
+                        mb: 1,
+                      }}
+                    >
+                      {movie.genres.map((genre) => (
+                        <Chip
+                          key={genre.id}
+                          label={genre.name}
+                          size="small"
+                          color="secondary"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Box>
+                  )}
+
                   <Box
                     sx={{
                       mt: "auto",
@@ -184,7 +207,7 @@ export default function Movies() {
                         )}
                       </Typography>
                     )}
-                    <div></div>
+
                     {movie.duration && (
                       <Chip
                         label={`${movie.duration} min`}
@@ -194,6 +217,26 @@ export default function Movies() {
                         sx={{ alignSelf: "flex-start" }}
                       />
                     )}
+                    {movie.certificate && movie.certificate.age > 13 && (
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        alignItems="center"
+                        sx={{ mt: 0.5 }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {movie.certificate.name}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="error.main"
+                          sx={{ fontWeight: 500 }}
+                        >
+                          • Only {movie.certificate.age}+
+                        </Typography>
+                      </Stack>
+                    )}
+
                     <Link to={`/shows/${movie.id}`}>
                       <Button variant="contained" color="error" size="small">
                         Book Now

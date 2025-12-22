@@ -18,16 +18,14 @@ export default function Navigation() {
     { label: "Movies", path: "/movies" },
     { label: "Bookings", path: "/bookings" },
   ];
-  const authNavItem = user
-    ? {
-        label: "Logout",
-        path: "#",
-      }
-    : {
-        label: "Login",
-        path: "/login",
-      };
-  const navItems = [...baseNavItems, authNavItem];
+  const authNavItem = !user && {
+    label: "Login",
+    path: "/login",
+  };
+  const navItems = [...baseNavItems];
+  if (authNavItem) {
+    navItems.push(authNavItem);
+  }
 
   return (
     <AppBar position="sticky">
@@ -50,7 +48,7 @@ export default function Navigation() {
           </Typography>
 
           <Box sx={{ display: "flex", gap: 2 }}>
-            {baseNavItems.map((item) => (
+            {navItems.map((item) => (
               <Button
                 key={item.path}
                 component={Link}
@@ -69,21 +67,19 @@ export default function Navigation() {
                 {item.label}
               </Button>
             ))}
-            <Button
-              onClick={logout}
-              sx={{
-                color: "inherit",
-                textDecoration:
-                  location.pathname === authNavItem.path ? "underline" : "none",
-                fontWeight:
-                  location.pathname === authNavItem.path ? "bold" : "normal",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            >
-              {authNavItem.label}
-            </Button>
+            {user && (
+              <Button
+                onClick={logout}
+                sx={{
+                  color: "inherit",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </Container>

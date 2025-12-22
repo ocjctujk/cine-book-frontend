@@ -10,20 +10,15 @@ import {
   CircularProgress,
   Paper,
   CardActionArea,
+  Chip,
+  Stack,
+  Avatar,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-interface Movie {
-  id: number;
-  name: string;
-  description: string;
-  release_date: string;
-  poster_url: string;
-  duration: number;
-}
+import type { Movie } from "../types/movie.types";
 
 interface Venue {
   id: number;
@@ -93,7 +88,7 @@ const Shows = () => {
     return (
       <Layout>
         <Box sx={{ display: "flex", justifyContent: "center", p: 8 }}>
-          <CircularProgress />
+          <CircularProgress size={60} />
         </Box>
       </Layout>
     );
@@ -102,8 +97,8 @@ const Shows = () => {
   if (error || shows.length === 0) {
     return (
       <Layout>
-        <Box sx={{ p: 4, textAlign: "center" }}>
-          <Alert severity="error">
+        <Box sx={{ p: 4, maxWidth: 600, mx: "auto", textAlign: "center" }}>
+          <Alert severity="error" sx={{ fontSize: "1rem" }}>
             {error
               ? "Failed to load shows. Please try again later."
               : "No shows available for this movie."}
@@ -114,6 +109,10 @@ const Shows = () => {
   }
 
   const movie = shows[0].movie;
+
+  // Separate cast and crew
+  const cast = movie.workers?.filter((w) => w.type === "cast") || [];
+  const crew = movie.workers?.filter((w) => w.type === "crew") || [];
 
   // Group shows: first by date (YYYY-MM-DD), then by venue
   const groupedByDate = shows.reduce((acc, show) => {
@@ -146,162 +145,407 @@ const Shows = () => {
         venues: Object.values(venueGroups),
       };
     })
-    .sort((a, b) => a.dateKey.localeCompare(b.dateKey)); // Sort dates ascending
+    .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
 
   return (
     <Layout>
-      <Box sx={{ p: { xs: 2, md: 4 } }}>
+      <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, maxWidth: 1400, mx: "auto" }}>
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
-            gap: 4,
+            gap: { xs: 3, md: 4 },
+            mb: 4,
           }}
         >
           {/* Movie Poster */}
-          <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 33.333%" } }}>
-            <Card elevation={6}>
+          <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 350px" } }}>
+            <Card
+              elevation={8}
+              sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                position: "sticky",
+                top: 20,
+              }}
+            >
               <CardMedia
                 component="img"
                 image={movie.poster_url}
                 alt={movie.name}
-                sx={{ height: 450, objectFit: "cover" }}
+                sx={{
+                  height: { xs: 400, sm: 500, md: 520 },
+                  objectFit: "cover",
+                }}
               />
             </Card>
           </Box>
 
-          {/* Movie Details & Grouped Shows */}
-          <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 66.666%" } }}>
-            <Typography variant="h3" gutterBottom fontWeight="bold">
+          {/* Movie Details */}
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h3"
+              gutterBottom
+              fontWeight="bold"
+              sx={{
+                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                mb: 2,
+              }}
+            >
               {movie.name}
             </Typography>
 
-            <Typography variant="body1" color="text.secondary" paragraph>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ mb: 2, flexWrap: "wrap", gap: 1 }}
+            >
+              <Chip
+                label={`${movie.duration} min`}
+                size="medium"
+                sx={{ fontWeight: 500 }}
+              />
+              {movie.certificate && (
+                <Chip
+                  label={`${movie.certificate.name} ${
+                    movie.certificate.age > 13
+                      ? `• ${movie.certificate.age}+`
+                      : ""
+                  }`}
+                  color={movie.certificate.age > 13 ? "error" : "default"}
+                  size="medium"
+                  sx={{ fontWeight: 500 }}
+                />
+              )}
+            </Stack>
+
+            {movie.genres && movie.genres.length > 0 && (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
+                {movie.genres.map((genre, idx) => (
+                  <Chip
+                    key={idx}
+                    label={genre.name}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                ))}
+              </Box>
+            )}
+
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              paragraph
+              sx={{
+                fontSize: "1.05rem",
+                lineHeight: 1.7,
+                mb: 3,
+              }}
+            >
               {movie.description}
             </Typography>
 
-            <Typography variant="subtitle1" gutterBottom>
-              Duration: {movie.duration} minutes
-            </Typography>
+            {/* Cast and Crew Section */}
+            {(cast.length > 0 || crew.length > 0) && (
+              <>
+                <Divider sx={{ my: 4 }} />
 
-            <Divider sx={{ my: 3 }} />
+                {cast.length > 0 && (
+                  <Box sx={{ mb: 4 }}>
+                    <Typography
+                      variant="h5"
+                      gutterBottom
+                      fontWeight="bold"
+                      sx={{ mb: 3 }}
+                    >
+                      Cast
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: {
+                          xs: "repeat(2, 1fr)",
+                          sm: "repeat(3, 1fr)",
+                          md: "repeat(4, 1fr)",
+                        },
+                        gap: 3,
+                      }}
+                    >
+                      {cast.map((person) => (
+                        <Box
+                          key={person.id}
+                          sx={{
+                            textAlign: "center",
+                            transition: "transform 0.2s",
+                            "&:hover": {
+                              transform: "translateY(-4px)",
+                            },
+                          }}
+                        >
+                          <Avatar
+                            src={person.image_url}
+                            alt={person.name}
+                            sx={{
+                              width: { xs: 80, sm: 100 },
+                              height: { xs: 80, sm: 100 },
+                              mx: "auto",
+                              mb: 1.5,
+                              border: "3px solid",
+                              borderColor: "primary.main",
+                              boxShadow: 2,
+                            }}
+                          >
+                            {person.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                          >
+                            {person.name}
+                          </Typography>
+                          {person.introduction && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                              }}
+                            >
+                              {person.introduction}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
 
-            <Typography variant="h5" gutterBottom>
-              Available Shows
-            </Typography>
+                {crew.length > 0 && (
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      gutterBottom
+                      fontWeight="bold"
+                      sx={{ mb: 3 }}
+                    >
+                      Crew
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: {
+                          xs: "repeat(2, 1fr)",
+                          sm: "repeat(3, 1fr)",
+                          md: "repeat(4, 1fr)",
+                        },
+                        gap: 3,
+                      }}
+                    >
+                      {crew.map((person) => (
+                        <Box
+                          key={person.id}
+                          sx={{
+                            textAlign: "center",
+                            transition: "transform 0.2s",
+                            "&:hover": {
+                              transform: "translateY(-4px)",
+                            },
+                          }}
+                        >
+                          <Avatar
+                            src={person.image_url}
+                            alt={person.name}
+                            sx={{
+                              width: { xs: 80, sm: 100 },
+                              height: { xs: 80, sm: 100 },
+                              mx: "auto",
+                              mb: 1.5,
+                              border: "3px solid",
+                              borderColor: "secondary.main",
+                              boxShadow: 2,
+                            }}
+                          >
+                            {person.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight="bold"
+                            sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                          >
+                            {person.name}
+                          </Typography>
+                          {person.introduction && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                              }}
+                            >
+                              {person.introduction}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </>
+            )}
+          </Box>
+        </Box>
 
-            {/* Grouped by Date */}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {groupedData.map(({ dateKey, dateDisplay, venues }) => (
-                <Box key={dateKey}>
-                  {/* Date Bar */}
+        <Divider sx={{ my: 5 }} />
+
+        {/* Shows Section */}
+        <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ mb: 4 }}>
+          Available Shows
+        </Typography>
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 5 }}>
+          {groupedData.map(({ dateKey, dateDisplay, venues }) => (
+            <Box key={dateKey}>
+              {/* Date Header */}
+              <Paper
+                elevation={4}
+                sx={{
+                  p: { xs: 2, sm: 2.5 },
+                  mb: 3,
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  borderRadius: 2,
+                  position: "sticky",
+                  top: 16,
+                  zIndex: 100,
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+                >
+                  {dateDisplay}
+                </Typography>
+              </Paper>
+
+              {/* Venues */}
+              {venues.map(({ venue, shows: venueShows }) => (
+                <Box key={venue.id} sx={{ mb: 5 }}>
                   <Paper
-                    elevation={3}
+                    elevation={1}
                     sx={{
-                      p: 2,
+                      p: 2.5,
                       mb: 3,
-                      backgroundColor: "primary.main",
-                      color: "primary.contrastText",
                       borderRadius: 2,
-                      position: "sticky",
-                      top: 0,
-                      zIndex: 10,
+                      backgroundColor: "grey.50",
+                      borderLeft: "4px solid",
+                      borderColor: "primary.main",
                     }}
                   >
-                    <Typography variant="h6" fontWeight="bold">
-                      {dateDisplay}
+                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
+                      {venue.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {venue.address_line_1}
+                      {venue.address_line_2 && `, ${venue.address_line_2}`}
+                      {" • "}
+                      {venue.city}, {venue.state}
                     </Typography>
                   </Paper>
 
-                  {/* Venues for this date */}
-                  {venues.map(({ venue, shows: venueShows }) => (
-                    <Box key={venue.id} sx={{ mb: 4 }}>
-                      <Box sx={{ mb: 2, ml: 1 }}>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                          {venue.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {venue.address_line_1}
-                          {venue.address_line_2 && `, ${venue.address_line_2}`}
-                          <br />
-                          {venue.city}, {venue.state}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                        {venueShows.map((show) => (
-                          <Box
-                            key={show.id}
-                            sx={{
-                              flex: {
-                                xs: "0 0 100%",
-                                sm: "0 0 50%",
-                                md: "0 0 33.333%",
-                              },
-                            }}
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(3, 1fr)",
+                        lg: "repeat(4, 1fr)",
+                      },
+                      gap: 2.5,
+                    }}
+                  >
+                    {venueShows.map((show) => (
+                      <Card
+                        key={show.id}
+                        elevation={2}
+                        sx={{
+                          height: "100%",
+                          borderRadius: 2,
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            elevation: 8,
+                            transform: "translateY(-4px)",
+                            boxShadow: 6,
+                          },
+                        }}
+                      >
+                        <CardActionArea
+                          onClick={() => navigate(`/shows/seats/${show.id}`)}
+                          sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "stretch",
+                          }}
+                        >
+                          <CardContent
+                            sx={{ flexGrow: 1, width: "100%", p: 3 }}
                           >
-                            <Card variant="outlined" sx={{ height: "100%" }}>
-                              <CardActionArea
-                                onClick={() =>
-                                  navigate(`/shows/seats/${show.id}`)
-                                } // Adjust the route as needed
+                            <Stack spacing={2}>
+                              <Box
                                 sx={{
-                                  height: "100%",
                                   display: "flex",
-                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  gap: 1.5,
                                 }}
                               >
-                                <CardContent
-                                  sx={{ flexGrow: 1, width: "100%" }}
-                                >
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      mb: 1,
-                                    }}
-                                  >
-                                    <AccessTimeIcon
-                                      sx={{ mr: 1, color: "primary.main" }}
-                                    />
-                                    <Typography variant="subtitle1">
-                                      {new Date(show.time).toLocaleTimeString(
-                                        "en-US",
-                                        {
-                                          timeStyle: "short",
-                                        }
-                                      )}
-                                    </Typography>
-                                  </Box>
+                                <AccessTimeIcon
+                                  sx={{
+                                    color: "primary.main",
+                                    fontSize: "1.75rem",
+                                  }}
+                                />
+                                <Typography variant="h6" fontWeight="bold">
+                                  {new Date(show.time).toLocaleTimeString(
+                                    "en-US",
+                                    {
+                                      timeStyle: "short",
+                                    }
+                                  )}
+                                </Typography>
+                              </Box>
 
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    <AttachMoneyIcon
-                                      sx={{ mr: 1, color: "primary.main" }}
-                                    />
-                                    <Typography
-                                      variant="h6"
-                                      color="success.main"
-                                    >
-                                      ₹{show.cost}
-                                    </Typography>
-                                  </Box>
-                                </CardContent>
-                              </CardActionArea>
-                            </Card>
-                          </Box>
-                        ))}
-                      </Box>
-                    </Box>
-                  ))}
+                              <Divider />
+
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1.5,
+                                }}
+                              >
+                                <Typography
+                                  variant="h5"
+                                  color="success.main"
+                                  fontWeight="bold"
+                                >
+                                  ₹{show.cost}
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    ))}
+                  </Box>
                 </Box>
               ))}
             </Box>
-          </Box>
+          ))}
         </Box>
       </Box>
     </Layout>
