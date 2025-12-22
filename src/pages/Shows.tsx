@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Grid,
   Divider,
   Alert,
   CircularProgress,
@@ -13,7 +12,6 @@ import {
   CardActionArea,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import TheaterComedyIcon from "@mui/icons-material/TheaterComedy";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -153,9 +151,15 @@ const Shows = () => {
   return (
     <Layout>
       <Box sx={{ p: { xs: 2, md: 4 } }}>
-        <Grid container spacing={4}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 4,
+          }}
+        >
           {/* Movie Poster */}
-          <Grid item xs={12} md={4}>
+          <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 33.333%" } }}>
             <Card elevation={6}>
               <CardMedia
                 component="img"
@@ -164,10 +168,10 @@ const Shows = () => {
                 sx={{ height: 450, objectFit: "cover" }}
               />
             </Card>
-          </Grid>
+          </Box>
 
           {/* Movie Details & Grouped Shows */}
-          <Grid item xs={12} md={8}>
+          <Box sx={{ flex: { xs: "0 0 100%", md: "0 0 66.666%" } }}>
             <Typography variant="h3" gutterBottom fontWeight="bold">
               {movie.name}
             </Typography>
@@ -224,9 +228,18 @@ const Shows = () => {
                         </Typography>
                       </Box>
 
-                      <Grid container spacing={3}>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
                         {venueShows.map((show) => (
-                          <Grid item xs={12} sm={6} md={4} key={show.id}>
+                          <Box
+                            key={show.id}
+                            sx={{
+                              flex: {
+                                xs: "0 0 100%",
+                                sm: "0 0 50%",
+                                md: "0 0 33.333%",
+                              },
+                            }}
+                          >
                             <Card variant="outlined" sx={{ height: "100%" }}>
                               <CardActionArea
                                 onClick={() =>
@@ -280,16 +293,16 @@ const Shows = () => {
                                 </CardContent>
                               </CardActionArea>
                             </Card>
-                          </Grid>
+                          </Box>
                         ))}
-                      </Grid>
+                      </Box>
                     </Box>
                   ))}
                 </Box>
               ))}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
     </Layout>
   );

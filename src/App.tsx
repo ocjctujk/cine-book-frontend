@@ -1,12 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
-import Home from "./pages/Home";
-import Movies from "./pages/Movies";
-import Bookings from "./pages/Bookings";
-import Shows from "./pages/Shows";
-import SeatSelection from "./pages/SeatSelection";
+import Payment from "./pages/Payment";
+import { AuthProvider } from "./context/AuthContext";
+import { protectedRoutes, publicRoutes } from "./constants/routes";
+import { PublicRoute } from "./components/PublicRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const theme = createTheme({
   palette: {
@@ -23,15 +22,24 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/movies" element={<Movies />} />
-          <Route path="/shows/:id" element={<Shows />} />
-          <Route path="/shows/seats/:id" element={<SeatSelection />} />
-          <Route path="/bookings" element={<Bookings />} />
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {publicRoutes.map((route) => (
+              <Route
+                path={route.path}
+                element={<PublicRoute>{route.element}</PublicRoute>}
+              />
+            ))}
+            {protectedRoutes.map((route) => (
+              <Route
+                path={route.path}
+                element={<ProtectedRoute>{route.element}</ProtectedRoute>}
+              />
+            ))}
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

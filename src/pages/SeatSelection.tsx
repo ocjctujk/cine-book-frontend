@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -20,10 +20,10 @@ interface Seat {
   name: string;
   columnLetter: string;
   rowNumber: number;
-  available: boolean;
+  isBooked: boolean;
 }
 
-interface ShowData {
+export interface ShowData {
   id: number;
   time: string;
   cost: string;
@@ -36,7 +36,9 @@ interface ShowData {
     state: string;
   };
   movie: {
+    id: number;
     name: string;
+    poster_url: string;
   };
   screen: {
     id: number;
@@ -209,7 +211,7 @@ export default function SeatSelection() {
                   <Stack direction="row" spacing={1}>
                     {seats.map((seat) => {
                       const isSelected = selectedSeats.includes(seat.id);
-                      const isAvailable = seat.available;
+                      const isAvailable = !seat.isBooked;
 
                       return (
                         <SeatButton
@@ -282,22 +284,30 @@ export default function SeatSelection() {
               </Typography>
             </Box>
           </Grid>
-
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            disabled={selectedSeats.length === 0}
-            sx={{
-              bgcolor: "#d32f2f",
-              "&:hover": { bgcolor: "#b71c1c" },
-              "&:disabled": { bgcolor: "#424242" },
-              py: 1.5,
-              fontWeight: "bold",
-            }}
-          >
-            Proceed to Payment
-          </Button>
+          <Link to={`/payment/${showData.id}`}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={selectedSeats.length === 0}
+              onClick={() => {
+                // localStorage.setItem(
+                //   "seats",
+                //   JSON.stringify({ seats: selectedSeats })
+                // );
+                localStorage.setItem("seats", JSON.stringify(selectedSeats));
+              }}
+              sx={{
+                bgcolor: "#d32f2f",
+                "&:hover": { bgcolor: "#b71c1c" },
+                "&:disabled": { bgcolor: "#424242" },
+                py: 1.5,
+                fontWeight: "bold",
+              }}
+            >
+              Proceed to Payment
+            </Button>
+          </Link>
         </Paper>
       </Container>
     </Layout>
