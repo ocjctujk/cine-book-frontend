@@ -1,3 +1,5 @@
+import type { UserRole } from "../components/ProtectedRoute";
+
 export type User = {
   id: number;
   firstName: string;
@@ -11,4 +13,5 @@ export type User = {
   city: string;
   state: string;
   pincode: string;
+  role: UserRole;
 };

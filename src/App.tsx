@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Payment from "./pages/Payment";
 import { AuthProvider } from "./context/AuthContext";
 import { protectedRoutes, publicRoutes } from "./constants/routes";
 import { PublicRoute } from "./components/PublicRoute";
@@ -34,7 +33,11 @@ function App() {
             {protectedRoutes.map((route) => (
               <Route
                 path={route.path}
-                element={<ProtectedRoute>{route.element}</ProtectedRoute>}
+                element={
+                  <ProtectedRoute requiredRoles={route.requiredRoles}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
               />
             ))}
           </Routes>

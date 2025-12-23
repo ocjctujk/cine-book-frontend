@@ -33,7 +33,7 @@ interface SeatData {
   available: boolean;
 }
 const Payment = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const params = useParams();
   const navigate = useNavigate();
   const showId = params.id;
@@ -96,13 +96,23 @@ const Payment = () => {
       seatIds: [...selectedSeats],
     };
     try {
-      const res = await fetch("http://localhost:3000/booking/", {
+      const response = await fetch("http://localhost:3000/booking/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        // response.ok is false for status codes like 401, 404, 500, etc.
+        const errorData = await response.json().catch(() => ({})); // Try to parse error details
+        throw new Error(
+          errorData.message || `Request failed with status ${response.status}`
+        );
+      }
+
       alert("Tickets booked successfully");
     } catch (error) {
       alert(error.message ?? "Failed to book the tickets");

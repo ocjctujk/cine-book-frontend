@@ -98,7 +98,7 @@ const AuthPage = () => {
         }
 
         // Success
-        login(data.user, data.token);
+        login(data.user, data.access_token);
       }
 
       // Redirect after success

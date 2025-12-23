@@ -1,9 +1,11 @@
 import { Typography, Box, Card, CardContent, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import { useAuth } from "../context/useAuth";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <Layout>
@@ -14,7 +16,7 @@ export default function Home() {
           gutterBottom
           sx={{ fontWeight: "bold", mb: 2 }}
         >
-          Welcome to Cine-Book
+          {user ? `Welcome, ${user.firstName}` : `Welcome to Cine-book`}
         </Typography>
         <Typography variant="h5" color="textSecondary" paragraph>
           Your ultimate movie booking platform

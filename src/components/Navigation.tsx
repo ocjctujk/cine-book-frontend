@@ -9,22 +9,32 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import MovieIcon from "@mui/icons-material/Movie";
 import { useAuth } from "../context/useAuth";
+import { UserRoles } from "../constants/constants";
 
 export default function Navigation() {
   const location = useLocation();
-  const { user, logout } = useAuth();
-  const baseNavItems = [
+  const { user } = useAuth();
+
+  let navItems = [
     { label: "Home", path: "/" },
     { label: "Movies", path: "/movies" },
     { label: "Bookings", path: "/bookings" },
+    user && { label: "Profile", path: "/profile" },
+    !user && {
+      label: "Login",
+      path: "/login",
+    },
   ];
-  const authNavItem = !user && {
-    label: "Login",
-    path: "/login",
-  };
-  const navItems = [...baseNavItems];
-  if (authNavItem) {
-    navItems.push(authNavItem);
+  if (user?.role === UserRoles.ADMIN) {
+    navItems = [
+      { label: "Home", path: "/" },
+      { label: "Movies", path: "/admin/movies" },
+      user && { label: "Profile", path: "/profile" },
+      !user && {
+        label: "Login",
+        path: "/login",
+      },
+    ];
   }
 
   return (
@@ -48,26 +58,29 @@ export default function Navigation() {
           </Typography>
 
           <Box sx={{ display: "flex", gap: 2 }}>
-            {navItems.map((item) => (
-              <Button
-                key={item.path}
-                component={Link}
-                to={item.path}
-                sx={{
-                  color: "inherit",
-                  textDecoration:
-                    location.pathname === item.path ? "underline" : "none",
-                  fontWeight:
-                    location.pathname === item.path ? "bold" : "normal",
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-            {user && (
+            {navItems.map(
+              (item) =>
+                item && (
+                  <Button
+                    key={item.path}
+                    component={Link}
+                    to={item.path}
+                    sx={{
+                      color: "inherit",
+                      textDecoration:
+                        location.pathname === item.path ? "underline" : "none",
+                      fontWeight:
+                        location.pathname === item.path ? "bold" : "normal",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                )
+            )}
+            {/* {user && (
               <Button
                 onClick={logout}
                 sx={{
@@ -79,7 +92,7 @@ export default function Navigation() {
               >
                 Logout
               </Button>
-            )}
+            )} */}
           </Box>
         </Toolbar>
       </Container>
