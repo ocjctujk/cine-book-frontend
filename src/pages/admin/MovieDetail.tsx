@@ -137,8 +137,6 @@ const MovieDetail = () => {
   }, [token]);
 
   const handleSubmit = async () => {
-    console.log(showFormData)
-    return;
     try {
       const res = await fetch("http://localhost:3000/shows", {
         method: "POST",
@@ -148,7 +146,12 @@ const MovieDetail = () => {
         },
         body: JSON.stringify({
           ...showFormData,
-          movie_id: id,
+          formatId: showFormData.format_id,
+          languageId: showFormData.language_id,
+          movieId: Number(id),
+          screenId: Number(showFormData.screen_id),
+          venueId: Number(showFormData.venue_id),
+          cost: Number(showFormData.cost),
         }),
       });
 

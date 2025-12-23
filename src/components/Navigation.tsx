@@ -28,7 +28,9 @@ export default function Navigation() {
   if (user?.role === UserRoles.ADMIN) {
     navItems = [
       { label: "Home", path: "/" },
-      { label: "Movies", path: "/admin/movies" },
+      { label: "Manage Shows", path: "/admin/movies" },
+      { label: "Shows", path: "/movies" },
+      { label: "Bookings", path: "/bookings" },
       user && { label: "Profile", path: "/profile" },
       !user && {
         label: "Login",

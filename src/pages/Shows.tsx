@@ -19,6 +19,8 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Movie } from "../types/movie.types";
+import { UserRoles } from "../constants/constants";
+import { useAuth } from "../context/useAuth";
 
 interface Venue {
   id: number;
@@ -51,7 +53,7 @@ const formatDateHeader = (isoString: string) => {
 const Shows = () => {
   const { id: movieId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);

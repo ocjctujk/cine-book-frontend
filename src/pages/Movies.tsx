@@ -16,8 +16,11 @@ import apiService from "../api/apiService";
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
 import type { Movie } from "../types/movie.types";
+import { useAuth } from "../context/useAuth";
+import { UserRoles } from "../constants/constants";
 
 export default function Movies() {
+  const { user } = useAuth();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
