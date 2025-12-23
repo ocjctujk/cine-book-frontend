@@ -13,6 +13,8 @@ import Venues from "../pages/admin/Venues";
 import VenueShows from "../pages/admin/VenueShows";
 import AdminMovies from "../pages/admin/Movies";
 import MovieDetail from "../pages/admin/MovieDetail";
+import SuperAdminMovies from "../pages/superadmin/Movies";
+import AddMoviePage from "../pages/superadmin/AddMovie";
 
 type Route = {
   path: string;
@@ -46,17 +48,17 @@ export const protectedRoutes: Route[] = [
   {
     path: "/payment/:id",
     element: <Payment />,
-    requiredRoles: [UserRoles.ADMIN, UserRoles.USER],
+    requiredRoles: [UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.USER],
   },
   {
     path: "/bookings",
     element: <Bookings />,
-    requiredRoles: [UserRoles.ADMIN, UserRoles.USER],
+    requiredRoles: [UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.USER],
   },
   {
     path: "/profile",
     element: <Profile />,
-    requiredRoles: [UserRoles.ADMIN, UserRoles.USER],
+    requiredRoles: [UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.USER],
   },
   {
     path: "/venues",
@@ -77,5 +79,15 @@ export const protectedRoutes: Route[] = [
     path: "/admin/movies/:id",
     element: <MovieDetail />,
     requiredRoles: [UserRoles.ADMIN],
+  },
+  {
+    path: "/superadmin/movies",
+    element: <SuperAdminMovies />,
+    requiredRoles: [UserRoles.SUPERADMIN],
+  },
+  {
+    path: "/superadmin/movies/add",
+    element: <AddMoviePage />,
+    requiredRoles: [UserRoles.SUPERADMIN],
   },
 ];

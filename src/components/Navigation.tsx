@@ -38,6 +38,19 @@ export default function Navigation() {
       },
     ];
   }
+  if (user?.role === UserRoles.SUPERADMIN) {
+    navItems = [
+      { label: "Home", path: "/" },
+      { label: "Manage Movies", path: "/superadmin/movies" },
+      { label: "Shows", path: "/movies" },
+      { label: "Bookings", path: "/bookings" },
+      user && { label: "Profile", path: "/profile" },
+      !user && {
+        label: "Login",
+        path: "/login",
+      },
+    ];
+  }
 
   return (
     <AppBar position="sticky">
