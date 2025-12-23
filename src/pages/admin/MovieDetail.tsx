@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Card,
@@ -53,12 +53,11 @@ const MovieDetail = () => {
   const [availableScreens, setAvailableScreens] = useState<any[]>([]);
   const { id } = useParams();
   const { token } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/movie/${id}`, {
+        const res = await fetch(`http://localhost:3000/movies/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

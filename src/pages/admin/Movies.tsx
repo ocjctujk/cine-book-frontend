@@ -33,7 +33,7 @@ const Movies = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("http://localhost:3000/movie", {
+        const res = await fetch("http://localhost:3000/movies", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

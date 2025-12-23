@@ -34,14 +34,11 @@ const VenueShows = () => {
   useEffect(() => {
     const fetchShows = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:3000/shows/venue?venue_id=${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch(`http://localhost:3000/shows/venue/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.ok) throw new Error("Failed to fetch shows");
         const data = await res.json();
         setShows(data);

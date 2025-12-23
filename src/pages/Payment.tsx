@@ -50,7 +50,7 @@ const Payment = () => {
   useEffect(() => {
     const fetchShowData = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/shows/?id=${showId}`);
+        const res = await fetch(`http://localhost:3000/shows/${showId}`);
 
         if (!res.ok) {
           throw new Error("Failed to fetch shows");
@@ -58,7 +58,7 @@ const Payment = () => {
 
         const data = await res.json();
         setShowData(data);
-        const res2 = await fetch("http://localhost:3000/seat/", {
+        const res2 = await fetch("http://localhost:3000/seats/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

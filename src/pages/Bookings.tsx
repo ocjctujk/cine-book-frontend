@@ -49,7 +49,7 @@ export default function Bookings() {
       if (!user?.id) return;
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:3000/booking/${user.id}`);
+        const res = await fetch(`http://localhost:3000/booking/user/${user.id}`);
 
         if (!res.ok) {
           throw new Error("Failed to fetch bookings");
